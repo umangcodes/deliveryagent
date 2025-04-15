@@ -51,6 +51,7 @@ export default function Dashboard() {
     };
 
     validateAndFetch();
+    console.log(orders)
   }, []);
 
   return (
@@ -71,7 +72,7 @@ export default function Dashboard() {
                   className="hover:shadow-lg transition cursor-pointer"
                 >
                   <CardHeader>
-                    <CardTitle>{order.customerName}</CardTitle>
+                    <CardTitle>{order.comments[0].comment}</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-1 text-sm text-gray-700">
                     <p>
@@ -96,7 +97,7 @@ export default function Dashboard() {
 
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>{order.comments.comment}</DialogTitle>
+                  <DialogTitle>Name: {order.comments[0].comment}</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-2">
                   <p><strong>Address:</strong> {order.deliveryAddress?.addressInfo}</p>
