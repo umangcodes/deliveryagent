@@ -102,7 +102,7 @@ export default function Dashboard() {
                 <div className="space-y-2">
                   <p><strong>Address:</strong> {order.deliveryAddress?.addressInfo}</p>
                   <p><strong>Phone:</strong> {order.customerPrimaryPhoneNumber}</p>
-                  <p><strong>Stop #:</strong> {order.stopNumber}</p>
+                  <p><strong>Delivery Notes:</strong> {order.deliveryAddress?.deliveryType}</p>
                   <p><strong>Tiffin Qty:</strong> {order.items?.tiffin}</p>
                   {order.specialItems?.length > 0 && (
                     <p><strong>Special Items:</strong> {order.specialItems.join(', ')}</p>
