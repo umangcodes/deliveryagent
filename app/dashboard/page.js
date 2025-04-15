@@ -51,13 +51,43 @@ export default function Dashboard() {
     };
 
     validateAndFetch();
-    console.log(orders)
   }, []);
 
-  return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6 text-center">📦 Today's Deliveries</h1>
+  const totalTiffins = orders.reduce((acc, order) => acc + (order.items?.tiffin || 0), 0);
+  const specialCount = orders.filter(order => order.specialItems?.length > 0).length;
 
+  return (
+    <div className="p-4 max-w-7xl mx-auto">
+      <h1 className="text-xl font-bold mb-4 text-center">Today's Deliveries</h1>
+
+      {/* Summary Card */}
+      {!loading && (
+        <div className="grid grid-cols-2 gap-3 mb-6">
+          <Card className="py-2 px-4">
+            <CardHeader className="p-2">
+              <CardTitle className="text-sm font-medium flex items-center gap-2">
+                📦 Regular Tiffins
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-xl font-bold text-green-600 p-2">
+              {totalTiffins}
+            </CardContent>
+          </Card>
+
+          <Card className="py-2 px-4">
+            <CardHeader className="p-2">
+              <CardTitle className="text-sm font-medium flex items-center gap-2">
+                🌟 Special Orders
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-xl font-bold text-yellow-600 p-2">
+              {specialCount}
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Orders */}
       {loading ? (
         <p className="text-center text-gray-600">Loading...</p>
       ) : orders.length === 0 ? (
@@ -69,40 +99,41 @@ export default function Dashboard() {
               <DialogTrigger asChild>
                 <Card
                   onClick={() => setSelectedOrder(order)}
-                  className="hover:shadow-lg transition cursor-pointer"
+                  className="cursor-pointer transition hover:shadow-md hover:scale-[1.01] border border-gray-200 hover:border-gray-300"
                 >
-                  <CardHeader>
-                    <CardTitle>{order.comments[0].comment}</CardTitle>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base font-semibold truncate">
+                      {order.comments[0]?.comment}
+                    </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-1 text-sm text-gray-700">
-                    <p>
-                      <strong>Phone:</strong> {order.customerPrimaryPhoneNumber}
-                    </p>
-                    <p className="hover:text-blue-600 underline cursor-pointer">
+                    <p><span className="font-medium">📞</span> {order.customerPrimaryPhoneNumber}</p>
+                    <p className="hover:text-blue-600 underline">
                       <a
                         href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(order.deliveryAddress?.addressInfo || '')}`}
                         target="_blank"
                         rel="noopener noreferrer"
                       >
-                        {order.deliveryAddress?.addressInfo || 'No address'}
+                        📍 {order.deliveryAddress?.addressInfo || 'No address'}
                       </a>
                     </p>
-                    <p>Qty: {order.items?.tiffin}</p>
+                    <p>🍱 Qty: {order.items?.tiffin}</p>
                     {order.specialItems?.length > 0 && (
-                      <p className="text-blue-500">Special: {order.specialItems.join(', ')}</p>
+                      <p className="text-blue-500">✨ {order.specialItems.join(', ')}</p>
                     )}
                   </CardContent>
                 </Card>
               </DialogTrigger>
 
-              <DialogContent>
+              <DialogContent className="max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
-                  <DialogTitle>Name: {order.comments[0].comment}</DialogTitle>
+                  <DialogTitle>{order.comments[0]?.comment}</DialogTitle>
                 </DialogHeader>
-                <div className="space-y-2">
+                <div className="space-y-2 text-sm text-gray-800 mt-2">
                   <p><strong>Address:</strong> {order.deliveryAddress?.addressInfo}</p>
                   <p><strong>Phone:</strong> {order.customerPrimaryPhoneNumber}</p>
-                  <p><strong>Delivery Notes:</strong> {order.deliveryAddress?.deliveryType}</p>
+                  <p><strong>Delivery Notes:</strong> {order.notes || 'N/A'}</p>
+                  <p><strong>Stop #:</strong> {order.stopNumber}</p>
                   <p><strong>Tiffin Qty:</strong> {order.items?.tiffin}</p>
                   {order.specialItems?.length > 0 && (
                     <p><strong>Special Items:</strong> {order.specialItems.join(', ')}</p>
