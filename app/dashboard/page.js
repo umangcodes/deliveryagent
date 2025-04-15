@@ -96,7 +96,7 @@ export default function Dashboard() {
 
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>{order.customerName}</DialogTitle>
+                  <DialogTitle>{order.comments.comment}</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-2">
                   <p><strong>Address:</strong> {order.deliveryAddress?.addressInfo}</p>
