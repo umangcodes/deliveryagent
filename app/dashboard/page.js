@@ -132,7 +132,7 @@ export default function Dashboard() {
                 <div className="space-y-2 text-sm text-gray-800 mt-2">
                   <p><strong>Address:</strong> {order.deliveryAddress?.addressInfo}</p>
                   <p><strong>Phone:</strong> {order.customerPrimaryPhoneNumber}</p>
-                  <p><strong>Delivery Notes:</strong> {order.notes || 'N/A'}</p>
+                  <p><strong>Delivery Notes:</strong> {order.deliveryAddress.deliveryType || 'N/A'}</p>
                   <p><strong>Stop #:</strong> {order.stopNumber}</p>
                   <p><strong>Tiffin Qty:</strong> {order.items?.tiffin}</p>
                   {order.specialItems?.length > 0 && (
