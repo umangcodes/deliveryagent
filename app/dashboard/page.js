@@ -5,6 +5,7 @@ import Cookies from 'js-cookie';
 
 import { verifyAccessCode } from '../../lib/api/auth';
 import { fetchOrdersByArea } from '../../lib/api/orders';
+import { confirmDelivery } from '../../lib/api/orders';
 
 import {
   Card,
@@ -55,6 +56,20 @@ export default function Dashboard() {
 
   const totalTiffins = orders.reduce((acc, order) => acc + (order.items?.tiffin || 0), 0);
   const specialCount = orders.filter(order => order.specialItems?.length > 0).length;
+
+  const handleDelivery = async (orderId) => {
+    try {
+      await confirmDelivery(orderId);
+      setOrders(prev =>
+        prev.map(order =>
+          order._id === orderId ? { ...order, delivered: true } : order
+        )
+      );
+      alert('✅ Delivery confirmed!');
+    } catch (error) {
+      alert('❌ Failed to confirm delivery');
+    }
+  };
 
   return (
     <div className="p-4 max-w-7xl mx-auto">
@@ -142,6 +157,7 @@ export default function Dashboard() {
                     <Button variant="default" onClick={() => window.open(`tel:${order.customerPrimaryPhoneNumber}`)}>📞 Call</Button>
                     <Button variant="secondary" onClick={() => window.open(`sms:${order.customerPrimaryPhoneNumber}`)}>💬 Text</Button>
                     <Button variant="outline" onClick={() => window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(order.deliveryAddress?.addressInfo || '')}`, '_blank')}>📍 View Map</Button>
+                    <Button variant="secondary" onClick={() => handleDelivery(order._id)}>✅ Delivered!</Button>
                   </div>
                 </div>
               </DialogContent>
