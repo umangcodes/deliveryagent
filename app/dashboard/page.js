@@ -114,7 +114,7 @@ export default function Dashboard() {
               <DialogTrigger asChild>
                 <Card
                   onClick={() => setSelectedOrder(order)}
-                  className="cursor-pointer transition hover:shadow-md hover:scale-[1.01] border border-gray-200 hover:border-gray-300"
+                  className={`cursor-pointer transition hover:shadow-md hover:scale-[1.01] border border-gray-200 hover:border-gray-300 ${order.status === 'delivered' ? ' border-green-900 border-2 bg-green-100':''}`}
                 >
                   <CardHeader className="pb-2">
                     <CardTitle className="text-base font-semibold truncate">
