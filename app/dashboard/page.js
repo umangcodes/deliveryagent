@@ -4,8 +4,7 @@ import { useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
 
 import { verifyAccessCode } from '../../lib/api/auth';
-import { fetchOrdersByArea } from '../../lib/api/orders';
-import { confirmDelivery } from '../../lib/api/orders';
+import { fetchOrdersByArea, confirmDelivery } from '../../lib/api/orders';
 
 import {
   Card,
@@ -26,32 +25,27 @@ export default function Dashboard() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
   const router = useRouter();
 
-  useEffect(() => {
-    const accessCode = Cookies.get('accessCode');
-    const areaCode = Cookies.get('areaCode');
-
-    if (!accessCode || !areaCode) {
+  const loadOrders = async () => {
+    try {
+      const accessCode = Cookies.get('accessCode');
+      const areaCode = Cookies.get('areaCode');
+      const validated = await verifyAccessCode(accessCode);
+      if (validated.areaCode !== areaCode) throw new Error('Access code mismatch');
+      const freshOrders = await fetchOrdersByArea(areaCode);
+      setOrders(freshOrders);
+      setLoading(false);
+    } catch (err) {
+      Cookies.remove('accessCode');
+      Cookies.remove('areaCode');
       router.push('/access-code');
-      return;
     }
+  };
 
-    const validateAndFetch = async () => {
-      try {
-        const validated = await verifyAccessCode(accessCode);
-        if (validated.areaCode !== areaCode) throw new Error('Access code mismatch');
-        const orders = await fetchOrdersByArea(areaCode);
-        setOrders(orders);
-        setLoading(false);
-      } catch (err) {
-        Cookies.remove('accessCode');
-        Cookies.remove('areaCode');
-        router.push('/access-code');
-      }
-    };
-
-    validateAndFetch();
+  useEffect(() => {
+    loadOrders();
   }, []);
 
   const totalTiffins = orders.reduce((acc, order) => acc + (order.items?.tiffin || 0), 0);
@@ -60,12 +54,9 @@ export default function Dashboard() {
   const handleDelivery = async (orderId) => {
     try {
       await confirmDelivery(orderId);
-      setOrders(prev =>
-        prev.map(order =>
-          order._id === orderId ? { ...order, delivered: true } : order
-        )
-      );
-      alert('✅ Delivery confirmed!');
+      setModalOpen(false);
+      setSelectedOrder(null);
+      await loadOrders();
     } catch (error) {
       alert('❌ Failed to confirm delivery');
     }
@@ -110,11 +101,23 @@ export default function Dashboard() {
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {orders.map((order, idx) => (
-            <Dialog key={idx}>
+            <Dialog
+              key={idx}
+              open={modalOpen && selectedOrder?._id === order._id}
+              onOpenChange={(open) => {
+                setModalOpen(open);
+                if (!open) setSelectedOrder(null);
+              }}
+            >
               <DialogTrigger asChild>
                 <Card
-                  onClick={() => setSelectedOrder(order)}
-                  className={`cursor-pointer transition hover:shadow-md hover:scale-[1.01] border border-gray-200 hover:border-gray-300 ${order.status === 'delivered' ? ' border-green-900 border-2 bg-green-100':''}`}
+                  onClick={() => {
+                    setSelectedOrder(order);
+                    setModalOpen(true);
+                  }}
+                  className={`cursor-pointer transition hover:shadow-md hover:scale-[1.01] border border-gray-200 hover:border-gray-300 ${
+                    order.status === 'delivered' ? 'border-green-900 border-2 bg-green-100' : ''
+                  }`}
                 >
                   <CardHeader className="pb-2">
                     <CardTitle className="text-base font-semibold truncate">
@@ -153,11 +156,11 @@ export default function Dashboard() {
                   {order.specialItems?.length > 0 && (
                     <p><strong>Special Items:</strong> {order.specialItems.join(', ')}</p>
                   )}
-                  <div className="flex gap-2 mt-4">
+                  <div className="flex flex-col gap-2 mt-4">
                     <Button variant="default" onClick={() => window.open(`tel:${order.customerPrimaryPhoneNumber}`)}>📞 Call</Button>
                     <Button variant="secondary" onClick={() => window.open(`sms:${order.customerPrimaryPhoneNumber}`)}>💬 Text</Button>
                     <Button variant="outline" onClick={() => window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(order.deliveryAddress?.addressInfo || '')}`, '_blank')}>📍 View Map</Button>
-                    <Button variant="secondary" onClick={() => handleDelivery(order._id)}>✅ Delivered!</Button>
+                    <Button variant="secondary" onClick={() => handleDelivery(order._id)}>✅ Completed</Button>
                   </div>
                 </div>
               </DialogContent>
