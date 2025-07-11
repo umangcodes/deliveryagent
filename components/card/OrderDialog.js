@@ -53,16 +53,11 @@ export default function OrderDialog({ order, children, handleStatusUpdate }) {
             <span>
                 Order for{" "}
                 <span className="font-bold">
-                {order.comments?.[0]?.comment?.split(" ")[0] || "Customer"}
+                {order.comments?.[0]?.comment?.split(" ")[0] || "Customer"} - {order.stopNumber}
                 </span>
             </span>
             </div>
         </DialogTitle>
-
-        <p className="text-sm font-medium text-gray-500 pl-10">
-            Stop Number:{" "}
-            <span className="text-gray-800 font-semibold">{order.stopNumber}</span>
-        </p>
         </DialogHeader>
 
 
