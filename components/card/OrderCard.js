@@ -4,18 +4,18 @@ export default function OrderCard({ order, onClick }) {
   return (
     <Card
       onClick={onClick}
-      className={`rounded-2xl shadow-md px-5 py-4 space-y-3 border-2 transition-all duration-150 cursor-pointer ${
+      className={`rounded-2xl shadow-md px-4 py-3 space-y-3 border-2 transition-all duration-150 cursor-pointer ${
         order.status === 'delivered'
           ? 'border-green-700 bg-green-100'
           : 'border-gray-300 bg-white'
       }`}
     >
       <div className="flex items-center justify-between">
-        <div className="text-lg sm:text-xl font-bold text-gray-900 truncate">
+        <div className="text-base sm:text-lg font-semibold text-gray-900 truncate">
           {order.comments?.[0]?.comment || 'No comment'}
         </div>
         <span
-          className={`text-sm px-3 py-1 rounded-full font-medium ${
+          className={`text-xs px-2.5 py-1 rounded-full font-medium ${
             order.status === 'delivered'
               ? 'bg-green-700 text-white'
               : 'bg-yellow-400 text-black'
@@ -25,13 +25,13 @@ export default function OrderCard({ order, onClick }) {
         </span>
       </div>
 
-      <div className="space-y-1 text-base text-gray-800">
+      <div className="space-y-1 text-sm text-gray-800">
         <div className="flex items-center gap-2">
-          <span className="text-lg">📞</span>
+          <span className="text-base">📞</span>
           <span className="font-medium">{order.customerPrimaryPhoneNumber}</span>
         </div>
         <div className="flex items-start gap-2">
-          <span className="text-lg mt-0.5">📍</span>
+          <span className="text-base mt-0.5">📍</span>
           <a
             href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(order.deliveryAddress?.addressInfo || '')}`}
             target="_blank"
@@ -42,7 +42,7 @@ export default function OrderCard({ order, onClick }) {
           </a>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-lg">🍱</span>
+          <span className="text-base">🍱</span>
           <span className="font-semibold">Tiffin Qty: {order.items?.tiffin || 0}</span>
         </div>
         {order.specialItems?.length > 0 && (

@@ -62,7 +62,6 @@ export default function Dashboard() {
           order._id === orderId ? { ...order, status: 'delivered' } : order
         )
       );
-      alert('✅ Delivery confirmed!');
     } catch (error) {
       alert('❌ Failed to confirm delivery');
     }
