@@ -24,6 +24,7 @@ export default function OrderDialog({ order, children, handleStatusUpdate }) {
   const [open, setOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [proofUploaded, setProofUploaded] = useState(false);
+  const [uploadFailureCount, setUploadFailureCount] = useState(0);
   const [imageModalOpen, setImageModalOpen] = useState(false);
   const [proofUrl, setProofUrl] = useState(null);
   const fileInputRef = useRef(null);
@@ -33,6 +34,9 @@ export default function OrderDialog({ order, children, handleStatusUpdate }) {
 
   const getAddress = () =>
     order.deliveryAddress?.addressInfo || 'N/A';
+
+  const hasProof = proofUploaded || Boolean(order.delivery?.proof?.gcsUrl);
+  const canManuallyDeliver = uploadFailureCount >= 2;
 
   const handleDelivered = async () => {
     await handleStatusUpdate(order._id);
@@ -51,13 +55,21 @@ export default function OrderDialog({ order, children, handleStatusUpdate }) {
     try {
       await confirmDeliveryWithProof(order._id, file);
       setProofUploaded(true);
+      setUploadFailureCount(0);
       await handleStatusUpdate(order._id);
       setOpen(false);
     } catch (err) {
       console.error(err);
-      alert('❌ Upload or delivery confirmation failed.');
+      const nextFailureCount = uploadFailureCount + 1;
+      setUploadFailureCount(nextFailureCount);
+      alert(
+        nextFailureCount >= 2
+          ? '❌ Upload failed twice. You can now mark this order as delivered without a photo.'
+          : '❌ Upload failed. Please try uploading the delivery photo again.'
+      );
     } finally {
       setUploading(false);
+      e.target.value = '';
     }
   };
 
@@ -188,14 +200,6 @@ export default function OrderDialog({ order, children, handleStatusUpdate }) {
                 <Navigation className="h-6 w-6" />
               </Button>
 
-              <Button
-                className="h-16 col-span-2 bg-green-100 border border-green-400 text-green-800 flex items-center justify-center rounded-xl shadow-md hover:scale-105 transition"
-                onClick={handleDelivered}
-                aria-label="Mark as Delivered"
-              >
-                ✅ Delivered
-              </Button>
-
               <div className="relative">
                 <input
                   type="file"
@@ -206,7 +210,8 @@ export default function OrderDialog({ order, children, handleStatusUpdate }) {
                 />
                 <Button
                   className={`h-16 w-full flex items-center justify-center rounded-xl shadow-md hover:scale-105 transition ${
-                    proofUploaded || order.delivery?.proof?.gcsUrl
+                    canManuallyDeliver ? 'col-span-1' : 'col-span-3'} ${
+                    hasProof
                       ? 'bg-green-100 border border-green-500 text-green-700'
                       : 'border-blue-600 text-blue-700 hover:bg-blue-50'
                   }`}
@@ -217,7 +222,7 @@ export default function OrderDialog({ order, children, handleStatusUpdate }) {
                 >
                   {uploading ? (
                     <span className="text-sm">Uploading...</span>
-                  ) : proofUploaded || order.delivery?.proof?.gcsUrl ? (
+                  ) : hasProof ? (
                     <span className="text-sm">📷 Replace Photo</span>
                   ) : (
                     <>
@@ -227,6 +232,22 @@ export default function OrderDialog({ order, children, handleStatusUpdate }) {
                   )}
                 </Button>
               </div>
+
+              {canManuallyDeliver && (
+                <Button
+                  className="h-16 col-span-2 bg-green-100 border border-green-400 text-green-800 flex items-center justify-center rounded-xl shadow-md hover:scale-105 transition"
+                  onClick={handleDelivered}
+                  aria-label="Mark as Delivered"
+                >
+                  ✅ Delivered
+                </Button>
+              )}
+
+              {!hasProof && (
+                <p className="col-span-3 text-xs text-amber-700">
+                  Upload a delivery photo to complete this order.
+                </p>
+              )}
 
               {/* View Proof Button */}
               {order.delivery?.proof?.gcsUrl && (
