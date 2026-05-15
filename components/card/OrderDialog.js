@@ -93,7 +93,8 @@ export default function OrderDialog({ order, children, handleStatusUpdate }) {
           <DialogHeader className="text-left space-y-1">
             <DialogTitle className="text-lg font-semibold text-gray-900 flex items-center gap-3">
               <Package className="h-6 w-6 text-primary" />
-              Order #{order.stopNumber} - {getCustomerName()}
+              Order #{order.stopNumber} - {getCustomerName()} <br />
+              Client: <span className="capitalize">{order.client}</span>
             </DialogTitle>
           </DialogHeader>
 
