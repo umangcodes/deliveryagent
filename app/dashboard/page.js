@@ -74,7 +74,7 @@ export default function Dashboard() {
 
   return (
     <div className="p-4 max-w-7xl mx-auto">
-      <h1 className="text-xl font-bold mb-4 text-center">Today's Deliveries</h1>
+      <h1 className="text-xl font-bold mb-4 text-center">Today&apos;s Deliveries</h1>
 
       {!loading && (
         <div className="grid grid-cols-2 gap-3 mb-6">
