@@ -90,12 +90,32 @@ export default function OrderDialog({ order, children, handleStatusUpdate }) {
         <DialogTrigger asChild>{children}</DialogTrigger>
 
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl px-5 py-6">
-          <DialogHeader className="text-left space-y-1">
-            <DialogTitle className="text-lg font-semibold text-gray-900 flex items-center gap-3">
-              <Package className="h-6 w-6 text-primary" />
-              Order #{order.stopNumber} - {getCustomerName()} <br />
-              Client: <span className="capitalize">{order.client}</span>
-            </DialogTitle>
+          <DialogHeader className="text-left">
+            <div className="rounded-xl border border-slate-200 bg-gradient-to-r from-slate-50 to-white p-4">
+              <DialogTitle className="text-lg font-semibold text-slate-900">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    <Package className="h-5 w-5 text-sky-600" />
+                    <span className="text-xs uppercase tracking-wide text-slate-500">Delivery Order</span>
+                  </div>
+                  <p className="mt-1 text-base font-bold leading-tight text-slate-900 break-words">
+                    #{order.stopNumber} - {getCustomerName()}
+                  </p>
+                </div>
+              </DialogTitle>
+
+              <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
+                <span className="rounded-full border border-sky-200 bg-sky-50 px-2.5 py-1 font-medium text-sky-800">
+                  Client: <span className="capitalize">{order.client || 'Internal'}</span>
+                </span>
+                <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 font-medium text-emerald-800">
+                  Stop #{order.stopNumber || 'N/A'}
+                </span>
+                <span className="rounded-full border border-slate-200 bg-slate-900 px-2.5 py-1 font-semibold text-white capitalize">
+                  {order.status || 'created'}
+                </span>
+              </div>
+            </div>
           </DialogHeader>
 
           <div className="space-y-6 mt-4 text-sm">
