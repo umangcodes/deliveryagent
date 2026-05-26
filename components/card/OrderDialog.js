@@ -56,8 +56,9 @@ export default function OrderDialog({ order, children, handleStatusUpdate }) {
       await confirmDeliveryWithProof(order._id, file);
       setProofUploaded(true);
       setUploadFailureCount(0);
-      // await handleStatusUpdate(order._id);
+      await handleStatusUpdate(order._id);
       setOpen(false);
+      //
     } catch (err) {
       console.error(err);
       const nextFailureCount = uploadFailureCount + 1;
@@ -71,6 +72,7 @@ export default function OrderDialog({ order, children, handleStatusUpdate }) {
       setUploading(false);
       e.target.value = '';
     }
+    //
   };
 
   const handleViewProof = async () => {
